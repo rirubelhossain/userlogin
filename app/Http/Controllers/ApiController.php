@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -66,25 +67,15 @@ class ApiController extends Controller
         //Token created, return with success response and jwt token
         return response()->json([
             'success' => true,
+            'message' => 'Login Successful',
             'token' => $token,
         ]);
     }
 
     public function logout(Request $request)
     {
-        //valid credential
-        $validator = Validator::make($request->only('token'), [
-            'token' => 'required'
-        ]);
-
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
-        }
-
-        //Request is validated, do logout
         try {
-            JWTAuth::invalidate($request->token);
+            JWTAuth::invalidate();
 
             return response()->json([
                 'success' => true,
@@ -103,5 +94,37 @@ class ApiController extends Controller
         $user = JWTAuth::authenticate($request->token);
 
         return response()->json(['user' => $user]);
+    }
+
+
+    public function updateProfile(Request $request)
+    {
+
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required|required'
+        ]);
+
+        $user = Auth::user();
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        try {
+            $user->save();
+            return response()->json([
+                'user' => $user,
+                'message' => "Profile Updated"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+        }
+
     }
 }

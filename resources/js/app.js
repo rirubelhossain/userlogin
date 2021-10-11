@@ -7,7 +7,10 @@ import App from "./components/App";
 
 window.Vue = require('vue').default;
 window.axios = require('axios');
-window.axios.defaults.headers.common = {'Authorization': `bearer ${localStorage._token}`}
+window.axios.defaults.headers.common = {
+    'Authorization': `bearer ${localStorage._token}`,
+    'Accept': 'application/json'
+}
 
 const router = new VueRouter({
     mode: 'history',

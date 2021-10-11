@@ -10,7 +10,7 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" v-model="email" id="email" name="email">
+                                <input type="email" class="form-control" v-model="email" id="email" name="email">
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
